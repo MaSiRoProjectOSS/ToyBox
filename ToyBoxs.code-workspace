@@ -8,5 +8,11 @@
 			"name": "ToyBox",
 			"path": "."
 		}
-	]
+	],
+	"settings": {
+		"cSpell.words": [
+			"Photosensors",
+			"XIAO"
+		]
+	}
 }

@@ -4,7 +4,7 @@
 
 * Seeeduino XIAO
 * 赤外線反射センサー
-  * 安いものは30cmぐらいの検知距離のものが購入可能。最大8mまでは確認済み
+  * 安いものは30cmぐらいの検知距離のものが購入可能。最大8mまでの製品があることを確認済み
 
 
 ### 配線
@@ -35,12 +35,59 @@ OUT_Photosensors -- Pin_XIAO : " * : 1"
 
 ### 動作
 
-* 赤外線反射センサーに反応があったらUARTに「detection」を表示
-* 検知中は基板上のLED点灯
-* １秒感覚で動作の判定（検知／非検知）を行う
 * 距離の設定は赤外線反射センサーの可変抵抗で行う
+* 100ms間隔(LOOP_DELAY_MS)で判定ロジックが動作する
+* 検知状態
+  * UARTに検知/検知なしを表示する
+    * 指定時間(DETECTION_WAITING_TIME_MS)経過後も検知し続けていたら「detection」を表示する
+    * 検知後に指定時間(FLAG_RELEASE_TIME_MS)経過しても検知が無かったら「lost」を表示する
+  * LED_LIGHTING_ON_BOARDが1ならば検知中は基板上のLED点灯
+
+
+### 設定
+
+#### PINのLOW/HIGH
+
+検知した時のLOW/HIGHの判定は下記の変数で設定している。
+
+```c++
+// LOWの時に検知した
+const uint8_t PIN_OUTPUT_STATUS = LOW;
+```
+
+#### 判定に使うPINの設定
+
+Pin0～4までの５つで行ている。
+下記のコードを'0'にすれば判定をしない。
+
+```c++
+#define DETECTION_ENABLE_01 1
+#define DETECTION_ENABLE_02 1
+#define DETECTION_ENABLE_03 1
+#define DETECTION_ENABLE_04 1
+#define DETECTION_ENABLE_05 1
+```
+
+PINの位置を変更したい場合は下記のコードでPIN番号を設定する。
+
+```c++
+const int DigitalAnalogPin_1 = 0;
+const int DigitalAnalogPin_2 = 1;
+const int DigitalAnalogPin_3 = 2;
+const int DigitalAnalogPin_4 = 3;
+const int DigitalAnalogPin_5 = 4;
+```
+
+#### 検知したときのボードのLED点灯
+
+検知したときにLEDを点灯させたくない場合は下記のコードを'0'に変更する。
+
+```c++
+#define LED_LIGHTING_ON_BOARD 1
+```
+
 
 ### 特記事項
 
-* 横に並べる場合は中心がもっとも検知距離が遠い山なりが良い感じに検知していた。
-* 検知距離を一定以上にすると横の制外線反射センサーを常時検知するためカバーなので物理的に届かないようにするか話す必要がある。
+* 横に並べる場合は中心から凸型になるように検知距離にすると良い感じに検知していた。
+* 検知距離を一定以上にすると横の赤外線反射センサーを常時検知するためカバーなので物理的に届かないようにするか話す必要がある。
