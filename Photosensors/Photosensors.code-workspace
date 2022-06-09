@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "Photosensors",
+			"path": "."
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"Photosensors",
+			"XIAO"
+		],
+		"task.autoDetect": "on"
+	}
+}
