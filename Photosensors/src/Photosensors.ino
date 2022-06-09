@@ -8,6 +8,8 @@
 */
 #include <Arduino.h>
 
+//#define DEBUG_OUTPUT
+
 ////////////////////////////////////////////////////
 // SETTING
 ////////////////////////////////////////////////////
@@ -16,7 +18,7 @@
 #define DETECTION_ENABLE_01 0
 #define DETECTION_ENABLE_02 0
 #define DETECTION_ENABLE_03 0
-#define DETECTION_ENABLE_04 0
+#define DETECTION_ENABLE_04 1
 #define DETECTION_ENABLE_05 1
 const uint8_t PIN_OUTPUT_STATUS = LOW;
 #define USB_WAIT_UNTIL_CONNECTED    0
@@ -27,11 +29,11 @@ const uint8_t PIN_OUTPUT_STATUS = LOW;
 /**
    @brief Operates after detecting the specified time
 */
-const int DETECTION_WAITING_TIME_MS = 1000;
+const int DETECTION_WAITING_TIME_MS = 500;
 /**
    @brief Drop the flag after the specified time
 */
-const int FLAG_RELEASE_TIME_MS = 3000;
+const int FLAG_RELEASE_TIME_MS = 1500;
 ////////////////////////////////////////////////////
 // CONFIGURATION
 ////////////////////////////////////////////////////
@@ -46,13 +48,12 @@ const int DigitalAnalogPin_2 = 1;
 const int DigitalAnalogPin_3 = 2;
 #endif
 #if DETECTION_ENABLE_04
-const int DigitalAnalogPin_4 = 3;
+const int DigitalAnalogPin_4 = 4;
 #endif
 #if DETECTION_ENABLE_05
-const int DigitalAnalogPin_5 = 4;
+const int DigitalAnalogPin_5 = 5;
 #endif
 
-//#define DEBUG_OUTPUT
 const int LOOP_DELAY_MS      = 100;
 const unsigned int BAUD_RATE = 115200;
 
@@ -394,7 +395,9 @@ void loop()
 {
     static int previous_mode   = -1;
     static int previous_result = -1;
-    static char buffer[100]    = "\0";
+#ifdef DEBUG_OUTPUT
+    static char buffer[100] = "\0";
+#endif
     static int mode;
     loop_serial();
     int result = loop_pin(&mode);
@@ -402,22 +405,35 @@ void loop()
         switch (result) {
             case STATE_PHOTOSENSORS_DETECTION:
             case STATE_PHOTOSENSORS_DETECTING:
-            case STATE_PHOTOSENSORS_DETECTED:
+                switch (mode) {
+                    case 16:
+                        SerialUSB.write("<\n");
+                        break;
+                    case 24:
+                        SerialUSB.write("|\n");
+                        break;
+                    case 8:
+                        SerialUSB.write(">\n");
+                        break;
+                    default:
+                        break;
+                }
                 if (previous_result != result) {
-                    SerialUSB.write("D\n");
                     //SerialUSB.write("DETECTED\n");
                 }
                 break;
             case STATE_PHOTOSENSORS_LOST:
-                SerialUSB.write("L\n");
+                SerialUSB.write("-\n");
                 //SerialUSB.write("LOST\n");
                 break;
             case STATE_PHOTOSENSORS_UNKNOWN:
             default:
-                sprintf(buffer, "RESULT[%d,%d]\n", result, mode);
-                SerialUSB.write(buffer);
                 break;
         }
+#ifdef DEBUG_OUTPUT
+        sprintf(buffer, "RESULT[%d,%d]\n", result, mode);
+        SerialUSB.write(buffer);
+#endif
         previous_mode   = mode;
         previous_result = result;
     }
