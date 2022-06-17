@@ -1,10 +1,6 @@
 {
 	"folders": [
 		{
-			"name": "Photosensors",
-			"path": "./Photosensors"
-		},
-		{
 			"name": "ToyBox",
 			"path": "."
 		}

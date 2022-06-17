@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"name": "photo_sensors",
+			"name": "TestBoard_A",
 			"path": "."
 		}
 	],
@@ -9,7 +9,8 @@
 		"platformio-ide.autoCloseSerialMonitor": true,
 		"platformio-ide.disablePIOHomeStartup": true,
 		"cSpell.words": [
-			"XIAO"
+			"XIAO",
+			"OLED"
 		],
 		"task.autoDetect": "on"
 	}
