@@ -8,9 +8,9 @@
  *
  */
 #include "devices/photo_sensors.hpp"
-#include "devices/rn4020_serial.hpp"
+#include "devices/serial_on_board.hpp"
+#include "devices/serial_usb.hpp"
 #include "devices/ssd1306.hpp"
-#include "devices/usb_serial.hpp"
 #include "settings.hpp"
 
 #include <Arduino.h>
@@ -38,6 +38,20 @@
 ////////////////////////////////////////////////////
 
 // ==================================================== //
+////////////////////////////////////////////////////
+// PRIVATE FUNCTION
+////////////////////////////////////////////////////
+static void send_text(const char value[])
+{
+    serial_usb_write(value);
+    serial_on_board_write(value);
+}
+
+// ==================================================== //
+////////////////////////////////////////////////////
+// Arduino FUNCTION
+////////////////////////////////////////////////////
+
 void setup()
 {
 #if LED_LIGHTING_ON_BOARD == 1
@@ -51,23 +65,34 @@ void setup()
     } while (!SerialUSB);
     char buffer[100];
     sprintf(buffer, "=======\nSTART : PhotoSensors\n=======\n");
-    SerialUSB.write(buffer);
+    send_text(buffer);
 #endif
 #endif
     setup_photo_sensors();
-    setup_usb_serial();
-    setup_rn4020_serial();
+    setup_serial_usb();
+    setup_serial_on_board();
     setup_ssd1306();
 }
 
 void loop()
 {
     loop_ssd1306();
+    static char *read_data[BUFFER_TEXT_SIZE];
     static int previous_mode   = -1;
     static int previous_result = -1;
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
     static char buffer[100] = "\0";
 #endif
+    if (true == serial_usb_read(read_data)) {
+        //
+        serial_on_board_write(*read_data);
+    }
+    if (true == serial_on_board_read(read_data)) {
+        //
+        serial_usb_write(*read_data);
+    }
+
+    // photo_sensors
     static int mode;
     int result = get_photo_sensors(&mode);
     if ((previous_mode != mode) || (previous_result != result)) {
@@ -76,43 +101,43 @@ void loop()
             case STATE_PHOTO_SENSORS_DETECTING:
                 switch (mode) {
                     case 1:
-                        SerialUSB.write("<\n");
+                        send_text("<\n");
                         break;
                     case 2:
-                        SerialUSB.write(">\n");
+                        send_text(">\n");
                         break;
                     case 3:
-                        SerialUSB.write("|\n");
+                        send_text("|\n");
                         break;
                     default:
                         break;
                 }
                 if (previous_result != result) {
-                    //SerialUSB.write("DETECTED\n");
+                    //send_text("DETECTED\n");
 #if LED_LIGHTING_ON_BOARD == 1
                     digitalWrite(PIN_LED, LOW); // turn LED on
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
-                    SerialUSB.write(" - turn LED on\n");
+                    send_text(" - turn LED on\n");
 #endif
 #endif
                 }
                 break;
             case STATE_PHOTO_SENSORS_LOST:
-                SerialUSB.write("-\n");
-                //SerialUSB.write("LOST\n");
+                send_text("-\n");
+                //send_text("LOST\n");
             case STATE_PHOTO_SENSORS_UNKNOWN:
             default:
 #if LED_LIGHTING_ON_BOARD == 1
                 digitalWrite(PIN_LED, HIGH); // turn LED off
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
-                SerialUSB.write(" - turn LED off\n");
+                send_text(" - turn LED off\n");
 #endif
 #endif
                 break;
         }
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
         sprintf(buffer, "RESULT[%d,%d]\n", result, mode);
-        SerialUSB.write(buffer);
+        send_text(buffer);
 #endif
         previous_mode   = mode;
         previous_result = result;

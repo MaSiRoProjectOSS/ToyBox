@@ -37,5 +37,11 @@
 #define DETECTION_RELEASE_TIME_MS 500
 #endif
 
+/**
+ * @brief default text size
+ */
+#ifndef BUFFER_TEXT_SIZE
+#define BUFFER_TEXT_SIZE 512
+#endif
 /////////////////////////////////////////////////////////////
 #endif
