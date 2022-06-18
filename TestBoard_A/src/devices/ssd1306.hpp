@@ -12,6 +12,6 @@
 #include <Arduino.h>
 
 void setup_ssd1306();
-int loop_ssd1306();
+bool ssd1306_write_text(const char *value, int x, int y);
 
 #endif

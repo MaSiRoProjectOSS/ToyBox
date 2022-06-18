@@ -45,6 +45,8 @@ static void send_text(const char value[])
 {
     serial_usb_write(value);
     serial_on_board_write(value);
+    //
+    ssd1306_write_text(value, 8 * 1, 13 * 3);
 }
 
 // ==================================================== //
@@ -76,20 +78,17 @@ void setup()
 
 void loop()
 {
-    loop_ssd1306();
-    static char *read_data[BUFFER_TEXT_SIZE];
-    static int previous_mode   = -1;
-    static int previous_result = -1;
+    static char read_data[BUFFER_TEXT_SIZE] = { '\0' };
+    static int previous_mode                = -1;
+    static int previous_result              = -1;
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
     static char buffer[100] = "\0";
 #endif
     if (true == serial_usb_read(read_data)) {
-        //
-        serial_on_board_write(*read_data);
+        serial_on_board_write(read_data);
     }
     if (true == serial_on_board_read(read_data)) {
-        //
-        serial_usb_write(*read_data);
+        serial_usb_write(read_data);
     }
 
     // photo_sensors
@@ -142,7 +141,6 @@ void loop()
         previous_mode   = mode;
         previous_result = result;
     }
-
     // delay
     delay(LOOP_DELAY_MS);
 }

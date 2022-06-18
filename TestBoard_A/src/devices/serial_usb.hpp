@@ -13,6 +13,6 @@
 
 void setup_serial_usb();
 bool serial_usb_write(const char value[]);
-bool serial_usb_read(char *out_data[]);
+bool serial_usb_read(char out_data[]);
 
 #endif

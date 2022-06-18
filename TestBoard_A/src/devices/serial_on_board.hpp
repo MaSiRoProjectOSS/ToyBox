@@ -13,6 +13,6 @@
 
 void setup_serial_on_board();
 bool serial_on_board_write(const char value[]);
-bool serial_on_board_read(char *out_data[]);
+bool serial_on_board_read(char out_data[]);
 
 #endif
