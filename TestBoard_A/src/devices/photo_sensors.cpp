@@ -39,61 +39,6 @@
 #define PHOTO_SENSORS_PIN_RANGE_MAX 10
 
 ////////////////////////////////////////////////////
-// SOFTWARE SETTINGS
-////////////////////////////////////////////////////
-const int DigitalAnalogPin_NUM = 5;
-/**
- * @brief DETECTION_PIN_NUMBER_1
- */
-#if PHOTO_SENSORS_PIN_RANGE_MIN <= DETECTION_PIN_NUMBER_1
-#if PHOTO_SENSORS_PIN_RANGE_MAX >= DETECTION_PIN_NUMBER_1
-const int DigitalAnalogPin_1 = DETECTION_PIN_NUMBER_1;
-#define DETECTION_ENABLE_01 1
-#endif
-#endif
-/**
- * @brief DETECTION_PIN_NUMBER_2
- */
-#if PHOTO_SENSORS_PIN_RANGE_MIN <= DETECTION_PIN_NUMBER_2
-#if PHOTO_SENSORS_PIN_RANGE_MAX >= DETECTION_PIN_NUMBER_2
-const int DigitalAnalogPin_2 = DETECTION_PIN_NUMBER_2;
-#define DETECTION_ENABLE_02 1
-#endif
-#endif
-/**
- * @brief DETECTION_PIN_NUMBER_3
- */
-#if PHOTO_SENSORS_PIN_RANGE_MIN <= DETECTION_PIN_NUMBER_3
-#if PHOTO_SENSORS_PIN_RANGE_MAX >= DETECTION_PIN_NUMBER_3
-const int DigitalAnalogPin_3 = DETECTION_PIN_NUMBER_3;
-#define DETECTION_ENABLE_03 1
-#endif
-#endif
-/**
- * @brief DETECTION_PIN_NUMBER_4
- */
-#if PHOTO_SENSORS_PIN_RANGE_MIN <= DETECTION_PIN_NUMBER_4
-#if PHOTO_SENSORS_PIN_RANGE_MAX >= DETECTION_PIN_NUMBER_4
-const int DigitalAnalogPin_4 = DETECTION_PIN_NUMBER_4;
-#define DETECTION_ENABLE_04 1
-#endif
-#endif
-/**
- * @brief DETECTION_PIN_NUMBER_5
- */
-#if PHOTO_SENSORS_PIN_RANGE_MIN <= DETECTION_PIN_NUMBER_5
-#if PHOTO_SENSORS_PIN_RANGE_MAX >= DETECTION_PIN_NUMBER_5
-const int DigitalAnalogPin_5 = DETECTION_PIN_NUMBER_5;
-#define DETECTION_ENABLE_05 1
-#endif
-#endif
-
-////////////////////////////////////////////////////
-// HARDWARE SETTINGS
-////////////////////////////////////////////////////
-const uint8_t PIN_OUTPUT_STATUS = LOW;
-
-////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS
 ////////////////////////////////////////////////////
 /**
@@ -104,39 +49,59 @@ const uint8_t PIN_OUTPUT_STATUS = LOW;
  * @return true
  * @return false
  */
-static bool get_pin_state(uint32_t pin_value, String buffer = "")
+bool PhotoSensors::get_pin_state(uint32_t pin_value)
 {
     bool result     = false;
     int buttonState = digitalRead(pin_value);
     if (PIN_OUTPUT_STATUS == buttonState) {
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
-        SerialUSB.write((buffer + "\n").c_str());
+        char text[255];
+        sprintf(text, " - buttonState[%ld]\n", pin_value);
+        SerialUSB.write(text);
 #endif
         result = true;
     }
     return result;
 }
 // ==================================================== //
+PhotoSensors::PhotoSensors()
+{
+    bool flag           = false;
+    this->pin_analog[0] = DETECTION_PIN_NUMBER_1;
+    this->pin_analog[1] = DETECTION_PIN_NUMBER_2;
+    this->pin_analog[2] = DETECTION_PIN_NUMBER_3;
+    this->pin_analog[3] = DETECTION_PIN_NUMBER_4;
+    this->pin_analog[4] = DETECTION_PIN_NUMBER_5;
+
+    for (int i = 0; i < this->DigitalAnalogPin_NUM; i++) {
+        flag = false;
+        if (PHOTO_SENSORS_PIN_RANGE_MIN > this->pin_analog[i]) {
+            flag = true;
+        } else if (PHOTO_SENSORS_PIN_RANGE_MAX < this->pin_analog[i]) {
+            flag = true;
+        } else {
+            // do nothing
+        }
+        if (true == flag) {
+            this->pin_analog[i] = -1;
+        }
+    }
+}
 ////////////////////////////////////////////////////
 // setup
 ////////////////////////////////////////////////////
-void setup_photo_sensors()
+void PhotoSensors::setup()
 {
-#if DETECTION_ENABLE_01
-    pinMode(DigitalAnalogPin_1, INPUT);
-#endif
-#if DETECTION_ENABLE_02
-    pinMode(DigitalAnalogPin_2, INPUT);
-#endif
-#if DETECTION_ENABLE_03
-    pinMode(DigitalAnalogPin_3, INPUT);
-#endif
-#if DETECTION_ENABLE_04
-    pinMode(DigitalAnalogPin_4, INPUT);
-#endif
-#if DETECTION_ENABLE_05
-    pinMode(DigitalAnalogPin_5, INPUT);
-#endif
+    this->flagState                              = STATE_PHOTO_SENSORS_LOST;
+    this->cntDetection                           = 0;
+    this->cntRelease                             = DETECTION_RELEASE_TIME_MS / LOOP_DELAY_MS;
+    this->flagDetect_previous[PHOTO_SENSORS_NUM] = { false };
+
+    for (int i = 0; i < this->DigitalAnalogPin_NUM; i++) {
+        if (-1 != this->pin_analog[i]) {
+            pinMode(this->pin_analog[i], INPUT);
+        }
+    }
 }
 
 /**
@@ -145,15 +110,11 @@ void setup_photo_sensors()
  * @return int  The sensor number detected is expressed in bits.
  *              If it is lost, return 'STATE_PHOTO_SENSORS'.
  */
-int get_photo_sensors(int *mode)
+int PhotoSensors::get_mode(int *mode)
 {
-    static STATE_PHOTO_SENSORS flagState                  = STATE_PHOTO_SENSORS_LOST;
-    static int cntDetection                               = 0;
-    static int cntRelease                                 = DETECTION_RELEASE_TIME_MS / LOOP_DELAY_MS;
-    static bool flagDetect_previous[DigitalAnalogPin_NUM] = { false };
-    bool flagDetect[DigitalAnalogPin_NUM]                 = { false };
-    int result                                            = 0;
-    bool flagDone                                         = false;
+    bool flagDetect[DigitalAnalogPin_NUM] = { false };
+    int result                            = 0;
+    bool flagDone                         = false;
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
     String str_append = "";
     char buffer[150];
@@ -161,22 +122,11 @@ int get_photo_sensors(int *mode)
     static unsigned long elapsed = 0;
 #endif
     *mode = 0;
-
-#if DETECTION_ENABLE_01
-    flagDetect[0] = get_pin_state(DigitalAnalogPin_1, " - buttonState_1");
-#endif
-#if DETECTION_ENABLE_02
-    flagDetect[1] = get_pin_state(DigitalAnalogPin_2, " - buttonState_2");
-#endif
-#if DETECTION_ENABLE_03
-    flagDetect[2] = get_pin_state(DigitalAnalogPin_3, " - buttonState_3");
-#endif
-#if DETECTION_ENABLE_04
-    flagDetect[3] = get_pin_state(DigitalAnalogPin_4, " - buttonState_4");
-#endif
-#if DETECTION_ENABLE_05
-    flagDetect[4] = get_pin_state(DigitalAnalogPin_5, " - buttonState_5");
-#endif
+    for (int i = 0; i < this->DigitalAnalogPin_NUM; i++) {
+        if (-1 != this->pin_analog[i]) {
+            flagDetect[i] = get_pin_state(this->pin_analog[i]);
+        }
+    }
     // determine whether to process
     for (int i = 0; i < DigitalAnalogPin_NUM; i++) {
         if (true == flagDetect[i]) {

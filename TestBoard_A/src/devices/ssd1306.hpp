@@ -9,9 +9,22 @@
  */
 #ifndef SSD1306_HPP
 #define SSD1306_HPP
+#include "../settings.hpp"
+
 #include <Arduino.h>
 
-void setup_ssd1306();
-bool ssd1306_write_text(const char *value, int x, int y);
+class OledForSSD1306 {
+private:
+    const int release_display_max = 10000 / LOOP_DELAY_MS;
+    int release_display_cnt       = release_display_max;
+    bool release_display_flag     = false;
+
+public:
+    void setup();
+    void loop();
+    bool write_text(const char *value, int x, int y);
+    void clear(void);
+void    set_display_flag(void);
+};
 
 #endif

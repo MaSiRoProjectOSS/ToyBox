@@ -36,17 +36,21 @@
 ////////////////////////////////////////////////////
 // Global variables
 ////////////////////////////////////////////////////
+OledForSSD1306 oled_display;
+PhotoSensors photo_sensors;
 
 // ==================================================== //
 ////////////////////////////////////////////////////
 // PRIVATE FUNCTION
 ////////////////////////////////////////////////////
-static void send_text(const char value[])
+#define TEXT_LINE_A 2
+#define TEXT_LINE_B 3
+static void send_text(const char value[], int line)
 {
     serial_usb_write(value);
     serial_on_board_write(value);
     //
-    ssd1306_write_text(value, 8 * 1, 13 * 3);
+    oled_display.write_text(value, 8 * 1, 13 * line);
 }
 
 // ==================================================== //
@@ -70,10 +74,10 @@ void setup()
     send_text(buffer);
 #endif
 #endif
-    setup_photo_sensors();
+    photo_sensors.setup();
     setup_serial_usb();
     setup_serial_on_board();
-    setup_ssd1306();
+    oled_display.setup();
 }
 
 void loop()
@@ -93,22 +97,25 @@ void loop()
 
     // photo_sensors
     static int mode;
-    int result = get_photo_sensors(&mode);
+    int result = photo_sensors.get_mode(&mode);
     if ((previous_mode != mode) || (previous_result != result)) {
         switch (result) {
-            case STATE_PHOTO_SENSORS_DETECTION:
-            case STATE_PHOTO_SENSORS_DETECTING:
+            case PhotoSensors::STATE_PHOTO_SENSORS_DETECTION:
+            case PhotoSensors::STATE_PHOTO_SENSORS_DETECTING:
                 switch (mode) {
+                    case 0:
+                        break;
                     case 1:
-                        send_text("<\n");
+                        send_text("<\n", TEXT_LINE_A);
                         break;
                     case 2:
-                        send_text(">\n");
+                        send_text(">\n", TEXT_LINE_A);
                         break;
                     case 3:
-                        send_text("|\n");
+                        send_text("|\n", TEXT_LINE_A);
                         break;
                     default:
+                        send_text("?\n", TEXT_LINE_A);
                         break;
                 }
                 if (previous_result != result) {
@@ -116,31 +123,32 @@ void loop()
 #if LED_LIGHTING_ON_BOARD == 1
                     digitalWrite(PIN_LED, LOW); // turn LED on
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
-                    send_text(" - turn LED on\n");
+                    send_text(" - turn LED on\n", TEXT_LINE_B);
 #endif
 #endif
                 }
                 break;
-            case STATE_PHOTO_SENSORS_LOST:
-                send_text("-\n");
+            case PhotoSensors::STATE_PHOTO_SENSORS_LOST:
+                send_text("-\n", TEXT_LINE_A);
                 //send_text("LOST\n");
-            case STATE_PHOTO_SENSORS_UNKNOWN:
+            case PhotoSensors::STATE_PHOTO_SENSORS_UNKNOWN:
             default:
 #if LED_LIGHTING_ON_BOARD == 1
                 digitalWrite(PIN_LED, HIGH); // turn LED off
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
-                send_text(" - turn LED off\n");
+                send_text(" - turn LED off\n", TEXT_LINE_B);
 #endif
 #endif
                 break;
         }
 #if DEBUG_OUTPUT_FOR_USB_SERIAL
         sprintf(buffer, "RESULT[%d,%d]\n", result, mode);
-        send_text(buffer);
+        send_text(buffer, TEXT_LINE_B);
 #endif
         previous_mode   = mode;
         previous_result = result;
     }
+    oled_display.loop();
     // delay
     delay(LOOP_DELAY_MS);
 }
