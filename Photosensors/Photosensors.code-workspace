@@ -1,13 +1,14 @@
 {
 	"folders": [
 		{
-			"name": "Photosensors",
+			"name": "photo_sensors",
 			"path": "."
 		}
 	],
 	"settings": {
+		"platformio-ide.autoCloseSerialMonitor": true,
+		"platformio-ide.disablePIOHomeStartup": true,
 		"cSpell.words": [
-			"Photosensors",
 			"XIAO"
 		],
 		"task.autoDetect": "on"
