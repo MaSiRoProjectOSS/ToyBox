@@ -8,9 +8,7 @@
  * @copyright Copyright (c) 2022
  *
  */
-
-//#include "setting.h"
-#include "__private_setting.h"
+#include "setting.h"
 
 #include <HTTPClient.h>
 #include <M5Stack.h>
@@ -25,6 +23,9 @@ const char ssid[]            = SETTING_WIFI_SSID;
 const char pass[]            = SETTING_WIFI_PASS;
 const char endpoint[]        = SETTING_URL_ENDPOINT;
 static int distance_previous = 0;
+int fontHeight               = 16;
+int screenHeight             = 240;
+int linePos                  = 0;
 
 enum TOP_STATUE
 {
@@ -36,7 +37,9 @@ enum TOP_STATUE
 void both_println_lcd(const char *value, uint16_t color = WHITE, bool clear = false)
 {
     static int line = 0;
-    if ((11 < line) || (true == clear)) {
+
+    linePos += fontHeight;
+    if ((screenHeight <= fontHeight) || (true == clear)) {
         M5.Lcd.setCursor(0, 0);
         M5.Lcd.clear();
         char str[150];
@@ -44,7 +47,8 @@ void both_println_lcd(const char *value, uint16_t color = WHITE, bool clear = fa
         M5.Lcd.setTextColor(GREEN, BLACK);
         M5.Lcd.println(str);
         Serial.println(str);
-        line = 2;
+        line    = 2;
+        linePos = fontHeight * 3;
     }
     M5.Lcd.setTextColor(color, BLACK);
     M5.Lcd.println(value);
@@ -90,13 +94,30 @@ void setup()
 
     M5.Lcd.setCursor(0, 0);
     M5.Lcd.setTextSize(2);
+    fontHeight   = M5.Lcd.fontHeight();
+    screenHeight = M5.Lcd.height();
 
     WiFi.begin(ssid, pass);
     both_println_lcd("WiFi connecting");
+    both_println_lcd(ssid);
+    int cnt_connecting = 0;
+    bool flag_line     = true;
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        M5.Lcd.print(".");
-        Serial.print(".");
+        if (25 <= cnt_connecting) {
+            M5.Lcd.setCursor(0, (fontHeight * 2) + 1);
+            cnt_connecting = -1;
+            flag_line      = !flag_line;
+            linePos += fontHeight;
+        }
+        if (false != flag_line) {
+            M5.Lcd.print(".");
+            Serial.print(".");
+        } else {
+            M5.Lcd.print("_");
+            Serial.print(".");
+        }
+        cnt_connecting++;
     }
     both_println_lcd("");
 
