@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": "TestBoard_A",
+			"path": "."
+		}
+	],
+	"settings": {
+		"platformio-ide.autoCloseSerialMonitor": true,
+		"platformio-ide.disablePIOHomeStartup": true,
+		"cSpell.words": [
+			"XIAO",
+			"OLED"
+		],
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/build": true,
+			"**/libdeps": true
+		},
+		"task.autoDetect": "on"
+	}
+}

@@ -1,14 +1,14 @@
 {
 	"folders": [
 		{
-			"name": "ToyBox",
+			"name": "Core_ESP32_ToF",
 			"path": "."
 		}
 	],
 	"settings": {
 		"cSpell.words": [
 			"Photosensors",
-			"XIAO"
+			"M5Stack"
 		]
 	}
 }
