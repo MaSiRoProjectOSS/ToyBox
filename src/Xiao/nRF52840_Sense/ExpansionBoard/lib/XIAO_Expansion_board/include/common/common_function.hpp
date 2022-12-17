@@ -12,15 +12,12 @@
 #ifndef USR_LIB_COMMON_FUNCTION_HPP
 #define USR_LIB_COMMON_FUNCTION_HPP
 
-namespace MaSiRoProject
-{
-namespace ToyBox
+namespace XIAO
 {
 class CommonFunction {
 public:
     static void output_message(bool message_type_is_error, const char *message, bool add_header = true);
 };
-} // namespace ToyBox
-} // namespace MaSiRoProject
+} // namespace XIAO
 
 #endif

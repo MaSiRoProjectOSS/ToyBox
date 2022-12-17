@@ -1,8 +1,9 @@
 {
-    "name": "Seeed_Studio_XIAO_Expansion_board ",
+    "name": "Seeed_Studio_XIAO_Expansion_board",
     "version": "0.1",
     "description": "Libraly for Seeed Studio XIAO Expansion board",
-    "keywords": "XIAO, SAMD21",
+    "keywords": "XIAO",
+    "url": "https://wiki.seeedstudio.com/Seeeduino-XIAO-Expansion-Board/",
     "authors": {
         "name": "MaSiRo Project.",
         "email": "masiro.to.akari@gmail.com",

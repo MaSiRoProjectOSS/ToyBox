@@ -8,16 +8,17 @@
  * @copyright Copyright (c) 2022 / MaSiRo Project.
  *
  */
-
 #include "common/common_function.hpp"
 
 #include <Arduino.h>
 
-using namespace MaSiRoProject::ToyBox;
-
+namespace XIAO
+{
 void CommonFunction::output_message(bool message_type_is_error, const char *message, bool add_header)
 {
-    // if (true == message_type_is_error)
+#ifndef LOG_VERBOSE
+    if (true == message_type_is_error)
+#endif
     {
         if (true == add_header) {
             char buffer[300];
@@ -30,9 +31,10 @@ void CommonFunction::output_message(bool message_type_is_error, const char *mess
             } else {
                 sprintf(buffer, "[     ] [%7ld.%03ld] : %s", tm_s, tm_ms, message);
             }
-            Serial.println(buffer);
+            SerialUSB.println(buffer);
         } else {
-            Serial.println(message);
+            SerialUSB.println(message);
         }
     }
 }
+} // namespace XIAO

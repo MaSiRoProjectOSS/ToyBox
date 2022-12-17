@@ -14,14 +14,11 @@
 
 #include <Arduino.h>
 
-namespace MaSiRoProject
+namespace XIAO
 {
-namespace ToyBox
-{
-typedef std::function<void(bool, const char *, bool)> ToyBoxMessageFunction;
-static bool set_callback_message(ToyBoxMessageFunction target, ToyBoxMessageFunction src);
+//typedef std::function<void(bool, const char *, bool)> ToyBoxMessageFunction;
+//static bool set_callback_message(ToyBoxMessageFunction target, ToyBoxMessageFunction src);
 
-} // namespace ToyBox
-} // namespace MaSiRoProject
+} // namespace XIAO
 
 #endif

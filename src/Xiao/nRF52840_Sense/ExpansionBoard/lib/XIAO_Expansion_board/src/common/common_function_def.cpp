@@ -10,10 +10,9 @@
  */
 #include "common/common_function_def.hpp"
 
-namespace MaSiRoProject
+namespace XIAO
 {
-namespace ToyBox
-{
+#if 0
 bool set_callback_message(ToyBoxMessageFunction target, ToyBoxMessageFunction src)
 {
     bool result = false;
@@ -28,6 +27,6 @@ bool set_callback_message(ToyBoxMessageFunction target, ToyBoxMessageFunction sr
     }
     return result;
 }
+#endif
 
-} // namespace ToyBox
-} // namespace MaSiRoProject
+} // namespace XIAO

@@ -38,7 +38,7 @@
 **/.vscode/.fuse**
 
 # my project
-__*
+**/__*
 **/.vscode/ipch
 **/.vscode/vc.db*
 **/.vscode/.browse.c_cpp.db*
