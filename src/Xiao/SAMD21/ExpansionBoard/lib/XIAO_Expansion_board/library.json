@@ -1,0 +1,20 @@
+{
+    "name": "Seeed_Studio_XIAO_Expansion_board ",
+    "version": "0.1",
+    "description": "Libraly for Seeed Studio XIAO Expansion board",
+    "keywords": "XIAO, SAMD21",
+    "authors": {
+        "name": "MaSiRo Project.",
+        "email": "masiro.to.akari@gmail.com",
+        "url": "https://www.masiro.cafe/"
+    },
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": "atmelsam",
+    "board": "seeed_xiao",
+    "dependencies": {},
+    "build": {
+        "includeDir": "include",
+        "srcDir": "src"
+    }
+}

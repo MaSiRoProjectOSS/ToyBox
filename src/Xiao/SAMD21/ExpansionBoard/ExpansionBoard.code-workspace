@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "ToyBox",
+			"path": "."
+		},
+		{
+			"name": "ExpansionBoard",
+			"path": "src/Xiao/SAMD21/ExpansionBoard"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"Photosensors",
+			"XIAO"
+		]
+	}
+}
