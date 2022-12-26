@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "ExpansionBoard",
+			"path": "."
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"Photosensors",
+			"XIAO",
+			"oled"
+		],
+		"files.associations": {
+			"cmath": "cpp",
+			"*.tcc": "cpp"
+		}
+	}
+}
