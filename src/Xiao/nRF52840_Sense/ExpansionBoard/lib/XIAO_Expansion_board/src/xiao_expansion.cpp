@@ -67,26 +67,44 @@ bool XIAOExpansion::loop(void)
     char buffer[255];
 #if EXAMPLE_LIBRARY_XIAO_LED
     this->Led->example();
-    sprintf(buffer,
-            "LED : RED[%s]/BLUE[%s]/GREEN[%s]",
-            ((HIGH == this->Led->RED->get()) ? "OFF" : " ON"),
-            ((HIGH == this->Led->BLUE->get()) ? "OFF" : " ON"),
-            ((HIGH == this->Led->GREEN->get()) ? "OFF" : " ON"));
-    CommonFunction::output_message(false, buffer);
+    static PinStatus last_led_r_status = LOW;
+    static PinStatus last_led_b_status = LOW;
+    static PinStatus last_led_g_status = LOW;
+    PinStatus current_led_r_status     = this->Led->RED->get();
+    PinStatus current_led_b_status     = this->Led->BLUE->get();
+    PinStatus current_led_g_status     = this->Led->GREEN->get();
+    if ((last_led_b_status != current_led_b_status) || (last_led_r_status != current_led_r_status) || (last_led_g_status != current_led_g_status)) {
+        last_led_b_status = current_led_b_status;
+        last_led_r_status = current_led_r_status;
+        last_led_g_status = current_led_g_status;
+        sprintf(buffer,
+                "LED : RED[%s]/BLUE[%s]/GREEN[%s]",
+                ((HIGH == current_led_r_status) ? "OFF" : " ON"),
+                ((HIGH == current_led_b_status) ? "OFF" : " ON"),
+                ((HIGH == current_led_g_status) ? "OFF" : " ON"));
+        CommonFunction::output_message(false, buffer);
+    }
 #endif
 #if EXAMPLE_LIBRARY_XIAO_USER_BUTTON
-    if (this->UserButton->get() == HIGH) {
+    static PinStatus last_button_status = LOW;
+    PinStatus current_button_states     = this->UserButton->get();
+    if (current_button_states == HIGH) {
         this->Led->BLUE->off();
     } else {
         this->Led->BLUE->on();
     }
-    sprintf(buffer, "BUTTON : [%s]", ((HIGH == this->UserButton->get()) ? "OFF" : " ON"));
-    CommonFunction::output_message(false, buffer);
+    if (last_button_status != current_button_states) {
+        last_button_status = current_button_states;
+        sprintf(buffer, "BUTTON : [%s]", ((HIGH == this->UserButton->get()) ? "OFF" : " ON"));
+        CommonFunction::output_message(false, buffer);
+    }
 #endif
 #if EXAMPLE_LIBRARY_XIAO_IMU
     this->Imu->loop();
 #endif
+#if EXAMPLE_LIBRARY_XIAO_OLED
     this->Oled->loop();
+#endif
     //////////////////////////////////
     // TODO : TEST
     //////////////////////////////////

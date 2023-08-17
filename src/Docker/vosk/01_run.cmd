@@ -3,6 +3,6 @@ FOR /F "usebackq delims== tokens=1,2" %%a IN ("src/vosk.config.ini") DO SET %%a=
 rem source src/vosk.config.ini
 rem ##------------------------------------------
 echo ------------------------------------------
-echo Start Vosk
+echo Start Vosk : PROT(%SERVER_PORT%)
 echo ------------------------------------------
 python src/client.py -u ws://localhost:%SERVER_PORT%

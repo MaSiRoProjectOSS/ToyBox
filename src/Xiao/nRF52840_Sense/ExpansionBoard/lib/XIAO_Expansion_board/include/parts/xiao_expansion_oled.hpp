@@ -36,8 +36,12 @@ public:
 
 public:
     bool setup(void);
-    bool loop(void);
     U8X8_SSD1306_128X64_NONAME_HW_I2C *Display;
+
+#if EXAMPLE_LIBRARY_XIAO_OLED
+public:
+    bool example();
+#endif
 
 private:
     const unsigned long READ_SPAN_MS = (1 * 1000);

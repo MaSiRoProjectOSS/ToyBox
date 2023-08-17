@@ -63,10 +63,11 @@ public:
 #if EXAMPLE_LIBRARY_XIAO_LED
 public:
     bool example();
-    const unsigned long READ_SPAN_MS = (2 * 1000);
 #endif
 
 private:
+    const unsigned long READ_SPAN_MS = (2 * 1000);
+    bool initialize                  = false;
 };
 } // namespace Parts
 } // namespace XIAO

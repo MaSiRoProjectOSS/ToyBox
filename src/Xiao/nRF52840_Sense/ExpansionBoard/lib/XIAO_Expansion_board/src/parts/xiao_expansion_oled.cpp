@@ -36,7 +36,10 @@ bool XIAOOled::setup(void)
     this->initialize = result;
     return this->initialize;
 }
-bool XIAOOled::loop(void)
+
+#if EXAMPLE_LIBRARY_XIAO_OLED
+
+bool XIAOOled::example(void)
 {
     static int col                     = 0;
     bool result                        = true;
@@ -44,8 +47,7 @@ bool XIAOOled::loop(void)
     if (true == this->initialize) {
         unsigned long current_time = millis();
         if ((this->READ_SPAN_MS + previous_time) < current_time) {
-            previous_time = current_time;
-#if EXAMPLE_LIBRARY_XIAO_OLED
+            previous_time             = current_time;
             static const String words = "Hello World!";
             int len                   = words.length();
             this->Display->setCursor(-col, 0);
@@ -54,11 +56,10 @@ bool XIAOOled::loop(void)
             if (col > len) {
                 col = 0;
             }
-#endif
         }
     }
     return result;
 }
-
+#endif
 } // namespace Parts
 } // namespace XIAO
